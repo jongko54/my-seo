@@ -1,52 +1,26 @@
-# database.py
 import os
-from dotenv import load_dotenv
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+from dotenv import load_dotenv
 
-# 1. .env 파일 로드
+# .env 파일 로드 (로컬 개발용)
 load_dotenv()
 
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
+# Railway에서 제공하는 URL 가져오기
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# 3. MySQL 연결 URL 생성
-# URL 인코딩 등 특수문자 처리가 필요할 수 있으나, 기본적으로는 아래와 같이 구성
-SQLALCHEMY_DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
+# SQLAlchemy는 'mysql://' 대신 'mysql+pymysql://'이 필요합니다.
+if DATABASE_URL and DATABASE_URL.startswith("mysql://"):
+    DATABASE_URL = DATABASE_URL.replace("mysql://", "mysql+pymysql://")
 
-# 4. 엔진 생성
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    pool_recycle=3600,
-    echo=False
-)
-
+# DB 엔진 생성
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 Base = declarative_base()
 
-
-# 5. 모델 정의
-class Place(Base):
-    __tablename__ = "places"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), index=True)
-    category = Column(String(100), index=True)
-    address = Column(String(255))
-    description = Column(Text)
-
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
-
-Base.metadata.create_all(bind=engine)
-
-
+# DB 세션 의존성 함수 (나중에 main.py에서 씀)
 def get_db():
     db = SessionLocal()
     try:
