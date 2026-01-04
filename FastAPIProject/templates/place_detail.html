@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ place.name }} - {{ place.address }} 추천</title>
+    <meta name="description" content="{{ place.category }} 추천! {{ place.description }}">
+</head>
+<body>
+    <h1>{{ place.name }}</h1>
+    <p><strong>카테고리:</strong> {{ place.category }}</p>
+    <p><strong>주소:</strong> {{ place.address }}</p>
+    <hr>
+    <div>
+        <h2>상세 소개</h2>
+        <p>{{ place.description }}</p>
+    </div>
+    <p><small>최종 수정일: {{ place.updated_at }}</small></p>
+</body>
+</html>
