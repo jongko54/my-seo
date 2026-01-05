@@ -1,127 +1,86 @@
-# main.py
-from fastapi import FastAPI, UploadFile, File, Depends, HTTPException, Response
-from fastapi.responses import PlainTextResponse
-from sqlalchemy.orm import Session
-import pandas as pd
-import io
-from datetime import datetime
-from database import get_db, Place, engine
+from fastapi import FastAPI, Depends, Request, HTTPException, Response
 from fastapi.templating import Jinja2Templates
-from fastapi import Request
+from fastapi.responses import HTMLResponse
+from sqlalchemy.orm import Session
+import models
+from database import engine, get_db
 
-app = FastAPI(title="맛집/술집 추천 SEO API")
+# 1. DB 테이블 자동 생성 (테이블이 없으면 만듭니다)
+models.Base.metadata.create_all(bind=engine)
+
+app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-
-# --- 1. 엑셀/CSV 데이터 연동 (업로드) ---
-
-@app.post("/upload-data/")
-async def upload_places(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    """
-    엑셀(.xlsx) 또는 CSV 파일을 업로드하여 DB에 저장합니다.
-    컬럼명: name, category, address, description
-    """
-
-    # 1. 파일 확장자 확인 및 데이터프레임 변환
-    contents = await file.read()
-    if file.filename.endswith('.csv'):
-        # 한글 깨짐 방지를 위해 encoding='utf-8-sig' 권장
-        df = pd.read_csv(io.BytesIO(contents), encoding='utf-8-sig')
-    elif file.filename.endswith(('.xls', '.xlsx')):
-        df = pd.read_excel(io.BytesIO(contents))
-    else:
-        raise HTTPException(status_code=400, detail="지원하지 않는 파일 형식입니다.")
-
-    # 2. 데이터 유효성 검사 및 DB 저장 (Bulk Insert)
-    # 실제로는 중복 체크 로직 등이 필요할 수 있습니다.
-    places_to_add = []
-    for _, row in df.iterrows():
-        place = Place(
-            name=row['name'],
-            category=row['category'],
-            address=row['address'],
-            description=row.get('description', '')  # 설명이 없으면 빈 값
-        )
-        places_to_add.append(place)
-
-    try:
-        db.add_all(places_to_add)
-        db.commit()
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"데이터 저장 중 오류 발생: {str(e)}")
-
-    return {"message": f"성공적으로 {len(places_to_add)}개의 맛집/술집 데이터를 등록했습니다."}
+# 도메인 주소 (나중에 사이트맵 만들 때 씀)
+DOMAIN = "https://bntflower.co.kr"
 
 
-# --- 2. 사이트맵 자동 생성 (SEO) ---
+# ==========================
+# 1. 홈 페이지
+# ==========================
+@app.get("/", response_class=HTMLResponse)
+def read_root(request: Request, db: Session = Depends(get_db)):
+    # 최신 데이터 10개만 가져와서 링크 보여주기
+    items = db.query(models.Market).limit(50).all()
 
-@app.get("/sitemap.xml", response_class=Response)
-def generate_sitemap(db: Session = Depends(get_db)):
-    """
-    구글 봇이 크롤링할 수 있도록 sitemap.xml을 동적으로 생성합니다.
-    모든 맛집/술집의 상세 페이지 URL을 반환합니다.
-    """
-    places = db.query(Place).all()
-    base_url = "bntflower.co.kr"  # 실제 운영 도메인으로 변경 필수
-
-    # XML 헤더
-    xml_content = ['<?xml version="1.0" encoding="UTF-8"?>']
-    xml_content.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
-
-    # 1. 정적 페이지 (메인 등)
-    xml_content.append(f"""
-    <url>
-        <loc>{base_url}/</loc>
-        <lastmod>{datetime.utcnow().strftime('%Y-%m-%d')}</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>1.0</priority>
-    </url>
-    """)
-
-    # 2. 동적 페이지 (DB에 있는 맛집들)
-    for place in places:
-        # URL 구조: /place/{id} 라고 가정
-        # lastmod: 구글에게 콘텐츠가 언제 수정되었는지 알려줌
-        last_mod = place.updated_at.strftime('%Y-%m-%d') if place.updated_at else datetime.utcnow().strftime('%Y-%m-%d')
-
-        xml_content.append(f"""
-        <url>
-            <loc>{base_url}/place/{place.id}</loc>
-            <lastmod>{last_mod}</lastmod>
-            <changefreq>weekly</changefreq>
-            <priority>0.8</priority>
-        </url>
-        """)
-
-    xml_content.append('</urlset>')
-
-    return Response(content="".join(xml_content), media_type="application/xml")
+    return templates.TemplateResponse("index_list.html", {
+        "request": request,
+        "items": items
+    })
+    # 주의: templates 폴더에 index_list.html도 간단히 하나 만들어주세요.
+    # (없으면 에러나니 아래 item.html과 비슷하게 만드시면 됩니다)
 
 
-# --- 3. Robots.txt (구글 봇 안내) ---
+# ==========================
+# 2. SEO 상세 페이지 (pSEO 핵심)
+# 주소 예시: https://bntflower.co.kr/market/rose
+# ==========================
+@app.get("/market/{keyword}", response_class=HTMLResponse)
+def read_item(request: Request, keyword: str, db: Session = Depends(get_db)):
+    # DB에서 keyword로 검색
+    item = db.query(models.Market).filter(models.Market.url_keyword == keyword).first()
 
-@app.get("/robots.txt", response_class=PlainTextResponse)
-def robots_txt():
-    """
-    검색 엔진 봇에게 sitemap 위치를 알려줍니다.
-    """
-    base_url = "bntflower.co.kr"  # 실제 도메인
+    if not item:
+        raise HTTPException(status_code=404, detail="상품을 찾을 수 없습니다.")
+
+    return templates.TemplateResponse("item.html", {"request": request, "item": item})
+
+
+# ==========================
+# 3. 사이트맵 자동 생성 (구글 제출용)
+# ==========================
+@app.get("/sitemap.xml")
+def sitemap(db: Session = Depends(get_db)):
+    items = db.query(models.Market).all()
+
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+    # 홈 추가
+    xml += f'<url><loc>{DOMAIN}/</loc></url>\n'
+
+    # DB에 있는 모든 페이지 추가
+    for item in items:
+        loc = f"{DOMAIN}/market/{item.url_keyword}"
+        xml += f'<url><loc>{loc}</loc></url>\n'
+
+    xml += '</urlset>'
+    return Response(content=xml, media_type="application/xml")
+
+
+# ==========================
+# 4. Robots.txt
+# ==========================
+@app.get("/robots.txt")
+def robots():
     content = f"""User-agent: *
 Allow: /
-Sitemap: {base_url}/sitemap.xml
+Sitemap: {DOMAIN}/sitemap.xml
 """
-    return content
+    return Response(content=content, media_type="text/plain")
 
 
-# --- [추가] 상세 페이지 라우터 (실제 화면) ---
-@app.get("/place/{place_id}")
-def read_place(request: Request, place_id: int, db: Session = Depends(get_db)):
-    # DB에서 해당 ID의 맛집 찾기
-    place = db.query(Place).filter(Place.id == place_id).first()
+if __name__ == "__main__":
+    import uvicorn
 
-    if not place:
-        raise HTTPException(status_code=404, detail="맛집을 찾을 수 없습니다.")
-
-    # HTML 파일에 데이터 채워서 보내주기
-    return
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

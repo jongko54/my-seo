@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BNT Flower - 전국 1등 꽃배달</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .item-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: flex; gap: 20px; }
+        .item-img { width: 150px; height: 150px; object-fit: cover; border-radius: 4px; }
+        .item-info { flex: 1; }
+        .price { color: #e74c3c; font-weight: bold; font-size: 1.2em; }
+        a { text-decoration: none; color: #333; }
+        a:hover { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">🌸 BNT Flower 전국 배송 서비스 🌸</h1>
+
+    {% if not items %}
+        <p style="text-align: center;">등록된 상품이 없습니다.</p>
+    {% else %}
+        {% for item in items %}
+        <div class="item-card">
+            {% if item.image_url %}
+            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="item-img">
+            {% endif %}
+
+            <div class="item-info">
+                <h2>
+                    <a href="/market/{{ item.url_keyword }}">{{ item.name }}</a>
+                </h2>
+
+                <p>{{ item.content }}</p>
+
+                <p class="price">
+                    {% if item.price == 0 %}
+                        가격 협의 / 견적 문의
+                    {% else %}
+                        {{ item.price }}원
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
