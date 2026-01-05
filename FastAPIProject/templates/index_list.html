@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>BNT Flower - 전국 1등 꽃배달</title>
+</head>
+<body>
+    <h1>🌸 BNT Flower 상품 목록 🌸</h1>
+
+    {% if not items %}
+        <p>등록된 상품이 없습니다.</p>
+    {% endif %}
+
+    <ul>
+    {% for item in items %}
+        <li style="border: 1px solid #ddd; margin: 10px; padding: 10px;">
+            {% if item.image_url %}
+                <img src="{{ item.image_url }}" alt="{{ item.name }}" width="200"><br>
+            {% endif %}
+
+            <h3>{{ item.name }}</h3>
+
+            <p>{{ item.content }}</p>
+
+            <p><strong>가격:</strong> {{ item.price }}원</p>
+        </li>
+    {% endfor %}
+    </ul>
+</body>
+</html>
