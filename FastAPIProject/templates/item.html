@@ -2,33 +2,13 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>{{ item.title }} | 비앤티플라워(bntflower)</title>
-    <meta name="description" content="{{ item.description }}">
-
-    <meta property="og:title" content="{{ item.title }}">
-    <meta property="og:description" content="{{ item.description }}">
-    <meta property="og:url" content="https://bntflower.co.kr/market/{{ item.url_keyword }}">
-
-    <link rel="canonical" href="https://bntflower.co.kr/market/{{ item.url_keyword }}">
+    <title>{{ item.name }} - 꽃배달</title>
 </head>
 <body>
-    <header>
-        <a href="/">🏠 홈으로 가기</a>
-    </header>
-
-    <main>
-        <h1>{{ item.title }}</h1>
-        <p style="color: gray;">추천 키워드: {{ item.url_keyword }}</p>
-        <hr>
-        <div class="content">
-            {{ item.content | safe }}
-        </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2024 BNT Flower Market</p>
-    </footer>
+    <h1>{{ item.name }}</h1>
+    <img src="{{ item.image_url }}" alt="{{ item.name }}" style="max-width:300px;">
+    <p>가격: {{ item.price }}원</p>
+    <p>{{ item.content }}</p>
+    <a href="/">목록으로 돌아가기</a>
 </body>
 </html>
