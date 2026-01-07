@@ -1,52 +1,188 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>꽃배달 쇼핑몰</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
-    <style>
-        body { font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif; }
-    </style>
-</head>
-<body class="bg-gray-50 text-gray-800">
+{% extends 'base.html' %}
 
-    <header class="bg-white shadow-sm sticky top-0 z-10">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-pink-500">🌸 전국 꽃배달</h1>
-            <nav>
-                <a href="#" class="text-sm text-gray-500 hover:text-pink-500">로그인</a>
-            </nav>
-        </div>
+{% block content %}
+<head>
+    <title>꽃배달 전문점 - 화환, 난, 관엽식물 당일 배송</title>
+    <meta name="description" content="전국 꽃배달 서비스. 결혼식/장례식 3단 화환, 승진 축하 동양란/서양란, 개업식 관엽식물 등 용도별 맞춤 상품을 3만원대부터 합리적인 가격에 만나보세요.">
+</head>
+
+<div class="main-container">
+    <header style="text-align: center; margin-bottom: 40px;">
+        <h2>💐 원하시는 상품을 선택해주세요</h2>
+        <p style="color: #666; font-size: 14px;">오후 3시 이전 주문 시 당일 배송 가능합니다.</p>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 py-10">
-        <h2 class="text-2xl font-bold mb-6">오늘의 추천 상품</h2>
+    <div class="card-list">
+        
+        <a href="/item/?category=화환" class="product-card">
+            <div class="card-content">
+                <h3>축하/근조 화환</h3>
+                <p class="desc">결혼식, 장례식장 3단 화환</p>
+                <p class="price">100,000원 ~</p>
+            </div>
+        </a>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {% for item in items %}
-                <a href="/market/{{ item.url_keyword }}" class="group block bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden border border-gray-100">
-                    <div class="aspect-w-1 aspect-h-1 w-full h-48 bg-gray-200 group-hover:opacity-90 transition">
-                         <div class="flex items-center justify-center h-full text-gray-400">이미지</div>
-                    </div>
+        <a href="/item/?category=난" class="product-card">
+            <div class="card-content">
+                <h3>동양란/서양란</h3>
+                <p class="desc">승진, 영전, 취임 축하 선물</p>
+                <p class="price">50,000원 ~</p>
+            </div>
+        </a>
 
-                    <div class="p-5">
-                        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-pink-500 mb-1">{{ item.name }}</h3>
-                        <p class="text-pink-600 font-bold">{{ item.price }}원</p>
-                    </div>
-                </a>
-            {% else %}
-                <div class="col-span-full text-center py-20 text-gray-500">
-                    <p>등록된 상품이 없습니다.</p>
-                </div>
-            {% endfor %}
-        </div>
-    </main>
+        <a href="/item/?category=꽃다발" class="product-card">
+            <div class="card-content">
+                <h3>꽃다발/꽃바구니</h3>
+                <p class="desc">기념일, 생일, 프로포즈</p>
+                <p class="price">30,000원 ~</p>
+            </div>
+        </a>
+        
+        <a href="/item/?category=탁상용" class="product-card">
+            <div class="card-content">
+                <h3>탁상용 화분</h3>
+                <p class="desc">책상 위 공기정화, 인테리어</p>
+                <p class="price">50,000원 ~</p>
+            </div>
+        </a>
 
-    <footer class="bg-white border-t mt-12 py-8 text-center text-sm text-gray-400">
-        &copy; 2024 꽃배달 서비스 All rights reserved.
-    </footer>
+        <a href="/item/?category=사무실" class="product-card">
+            <div class="card-content">
+                <h3>사무실용 대형 화분</h3>
+                <p class="desc">개업식, 사무실 이전, 거실용</p>
+                <p class="price">100,000원 ~</p>
+            </div>
+        </a>
 
-</body>
-</html>
+    </div>
+</div>
+
+<style>
+    .main-container { padding: 40px; max-width: 1000px; margin: 0 auto; }
+    
+    .card-list {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    /* a 태그의 밑줄 제거 및 카드 스타일 적용 */
+    .product-card {
+        text-decoration: none; /* 링크 밑줄 제거 */
+        color: inherit; /* 글자색 상속 */
+        border: 1px solid #eee;
+        border-radius: 12px;
+        width: 180px; /* 카드 너비 */
+        background: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        display: flex; /* 내부 정렬을 위해 */
+        flex-direction: column;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px); /* 살짝 떠오르는 효과 */
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        border-color: #ff6b6b; /* 포인트 컬러 */
+    }
+
+    .card-content {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .card-content h3 { font-size: 18px; margin: 0 0 10px 0; color: #333; }
+    .card-content .desc { font-size: 13px; color: #777; margin-bottom: 15px; height: 32px; /* 두 줄 높이 고정 */ }
+    .card-content .price { font-weight: bold; color: #ff6b6b; font-size: 16px; margin: 0; }
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "Product",
+        "name": "축하/근조 화환",
+        "description": "결혼식 및 장례식용 3단 화환. 서울/경기 3시간 내 배송.",
+        "offers": {
+          "@type": "AggregateOffer",
+          "lowPrice": "100000",
+          "highPrice": "300000",
+          "priceCurrency": "KRW"
+        },
+        "url": "{{ request.scheme }}://{{ request.get_host }}/item/?category=화환"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "Product",
+        "name": "동양란/서양란",
+        "description": "승진, 영전, 취임 축하용 고급 난.",
+        "offers": {
+          "@type": "AggregateOffer",
+          "lowPrice": "50000",
+          "highPrice": "300000",
+          "priceCurrency": "KRW"
+        },
+        "url": "{{ request.scheme }}://{{ request.get_host }}/item/?category=난"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "item": {
+        "@type": "Product",
+        "name": "꽃다발/꽃바구니",
+        "description": "기념일, 생일 축하용 계절 꽃다발.",
+        "offers": {
+          "@type": "AggregateOffer",
+          "lowPrice": "30000",
+          "highPrice": "200000",
+          "priceCurrency": "KRW"
+        },
+        "url": "{{ request.scheme }}://{{ request.get_host }}/item/?category=꽃다발"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "item": {
+        "@type": "Product",
+        "name": "탁상용 화분",
+        "description": "공기정화 식물, 인테리어 미니 화분.",
+        "offers": {
+          "@type": "AggregateOffer",
+          "lowPrice": "50000",
+          "highPrice": "200000",
+          "priceCurrency": "KRW"
+        },
+        "url": "{{ request.scheme }}://{{ request.get_host }}/item/?category=탁상용"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "item": {
+        "@type": "Product",
+        "name": "사무실용 대형 화분",
+        "description": "개업 축하, 거실 인테리어용 대형 관엽식물.",
+        "offers": {
+          "@type": "AggregateOffer",
+          "lowPrice": "100000",
+          "highPrice": "300000",
+          "priceCurrency": "KRW"
+        },
+        "url": "{{ request.scheme }}://{{ request.get_host }}/item/?category=사무실"
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
