@@ -4,31 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ item.title }} | 비앤티플라워(bntflower)</title>
-    <meta name="description" content="{{ item.description }}">
+    <title>상품 주문 - BNT플라워</title>
 
-    <meta property="og:title" content="{{ item.title }}">
-    <meta property="og:description" content="{{ item.description }}">
-    <meta property="og:url" content="https://bntflower.co.kr/market/{{ item.url_keyword }}">
+    <meta name="description" content="BNT플라워 간편 주문 페이지. 원하시는 상품의 수량과 가격 옵션을 선택해주세요.">
+    <meta property="og:site_name" content="BNT플라워">
+    <meta property="og:title" content="BNT플라워 상품 주문">
+    <meta property="og:url" content="https://bntflower.co.kr/item">
+    <link rel="canonical" href="https://bntflower.co.kr/item">
 
-    <link rel="canonical" href="https://bntflower.co.kr/market/{{ item.url_keyword }}">
+    <style>
+        /* 스타일은 기존과 동일 */
+        body { font-family: 'Pretendard', sans-serif; background-color: #f5f5f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 400px; max-width: 90%; }
+
+        h2 { text-align: center; color: #333; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; color: #555; }
+
+        select, .price-box { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+
+        .price-options { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        .price-option label { font-weight: normal; cursor: pointer; display: flex; align-items: center; padding: 5px; border-radius: 5px; transition: background 0.2s; }
+        .price-option label:hover { background-color: #f0f0f0; }
+        .price-option input { margin-right: 10px; accent-color: #ff6b6b; }
+
+        .footer { margin-top: 40px; display: flex; justify-content: flex-end; align-items: center; border-top: 2px solid #eee; padding-top: 20px; }
+        .total-price { font-size: 20px; font-weight: bold; color: #333; margin-right: 15px; }
+        .pay-btn { background-color: #ff6b6b; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .pay-btn:hover { background-color: #ee5253; }
+    </style>
 </head>
 <body>
-    <header>
-        <a href="/">🏠 홈으로 가기</a>
-    </header>
 
-    <main>
-        <h1>{{ item.title }}</h1>
-        <p style="color: gray;">추천 키워드: {{ item.url_keyword }}</p>
-        <hr>
-        <div class="content">
-            {{ item.content | safe }}
-        </div>
-    </main>
+<div class="container">
+    <h2>💐 주문 옵션 선택</h2>
 
-    <footer>
-        <p>&copy; 2024 BNT Flower Market</p>
-    </footer>
+    <div class="form-group">
+        <label for="category">상품 종류</label>
+        <select id="category" onchange="updatePriceOptions()">
+            <option value="화환">화환</option>
+            <option value="난">난</option>
+            <option value="꽃다발">꽃다발</option>
+            <option value="탁상용">탁상용 화분</option>
+            <option value="사무실">사무실용 화분</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="quantity">수량</label>
+        <select id="quantity" onchange="calculateTotal()">
+            <option value="1">1개</option>
+            <option value="2">2개</option>
+            <option value="3">3개</option>
+            <option value="4">4개</option>
+            <option value="5">5개</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>가격대 선택</label>
+        <div id="price-container" class="price-options">
+            </div>
+    </div>
+
+    <div class="footer">
+        <div class="total-price" id="total-display">0원</div>
+        <button class="pay-btn" onclick="alert('PG사 결제 모듈 연동이 필요합니다.')">결제하기</button>
+    </div>
+</div>
+
+<script>
+    const priceData = {
+        "화환": [100000, 150000, 200000, 300000],
+        "난": [50000, 100000, 150000, 200000, 300000],
+        "꽃다발": [30000, 50000, 70000, 100000, 150000, 200000],
+        "탁상용": [50000, 70000, 100000, 150000, 200000],
+        "사무실": [100000, 150000, 200000, 300000]
+    };
+
+    let selectedPrice = 0;
+
+    window.onload = function() {
+        // URL 파라미터 확인 (예: ?category=화환)
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryParam = urlParams.get('category');
+
+        if(categoryParam && priceData[categoryParam]) {
+            document.getElementById("category").value = categoryParam;
+        }
+
+        // 초기 화면 그리기
+        updatePriceOptions();
+    };
+
+    function updatePriceOptions() {
+        const category = document.getElementById("category").value;
+
+        // ★ 중요: 카테고리가 바뀔 때마다 브라우저 탭 제목을 바꿔줍니다.
+        // 예: "화환 주문 - BNT플라워"
+        document.title = category + " 주문 - BNT플라워";
+
+        const container = document.getElementById("price-container");
+        const prices = priceData[category];
+
+        container.innerHTML = ""; // 기존 내용 비우기
+
+        prices.forEach((price, index) => {
+            const div = document.createElement("div");
+            div.className = "price-option";
+
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "priceSelect";
+            radio.value = price;
+            radio.id = "p" + index;
+
+            // 라디오 버튼 클릭 시 계산
+            radio.onchange = function() {
+                selectedPrice = parseInt(this.value);
+                calculateTotal();
+            };
+
+            const label = document.createElement("label");
+            label.htmlFor = "p" + index;
+            label.innerText = price.toLocaleString() + "원";
+            label.prepend(radio);
+
+            div.appendChild(label);
+            container.appendChild(div);
+        });
+
+        // 카테고리 변경 시 선택값 초기화
+        selectedPrice = 0;
+        document.getElementById("total-display").innerText = "0원";
+    }
+
+    function calculateTotal() {
+        const quantity = parseInt(document.getElementById("quantity").value);
+        const total = selectedPrice * quantity;
+        document.getElementById("total-display").innerText = total.toLocaleString() + "원";
+    }
+</script>
+
 </body>
 </html>

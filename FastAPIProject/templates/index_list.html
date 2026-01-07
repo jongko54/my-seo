@@ -3,46 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BNT Flower - 전국 1등 꽃배달</title>
+
+    <title>BNT플라워 - 전국 화환, 난, 관엽식물 당일 배송</title>
+
+    <meta name="description" content="BNT플라워 공식 홈페이지. 결혼식/장례식 3단 화환, 승진 영전 축하 동양란, 개업식 관엽식물 등 고품질 꽃배달 서비스를 합리적인 가격에 제공합니다.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="BNT플라워 - 마음을 전하는 꽃배달">
+    <meta property="og:description" content="전국 3시간 당일 배송, 화환/난/관엽식물 전문.">
+    <meta property="og:url" content="https://bntflower.co.kr">
+    <meta property="og:site_name" content="BNT플라워">
+
+    <link rel="canonical" href="https://bntflower.co.kr">
+
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .item-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 8px; display: flex; gap: 20px; }
-        .item-img { width: 150px; height: 150px; object-fit: cover; border-radius: 4px; }
-        .item-info { flex: 1; }
-        .price { color: #e74c3c; font-weight: bold; font-size: 1.2em; }
-        a { text-decoration: none; color: #333; }
-        a:hover { color: #e74c3c; }
+        /* 스타일은 기존과 동일하게 유지 */
+        body { font-family: 'Pretendard', sans-serif; margin: 0; background-color: #f9f9f9; }
+        .main-container { padding: 40px; max-width: 1000px; margin: 0 auto; }
+        .card-list { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+
+        .product-card {
+            text-decoration: none; color: inherit; border: 1px solid #eee; border-radius: 12px;
+            width: 180px; background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            display: flex; flex-direction: column;
+        }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); border-color: #ff6b6b; }
+        .card-content { padding: 20px; text-align: center; }
+        .card-content h3 { font-size: 18px; margin: 0 0 10px 0; color: #333; }
+        .card-content .desc { font-size: 13px; color: #777; margin-bottom: 15px; height: 32px; }
+        .card-content .price { font-weight: bold; color: #ff6b6b; font-size: 16px; margin: 0; }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">🌸 BNT Flower 전국 배송 서비스 🌸</h1>
 
-    {% if not items %}
-        <p style="text-align: center;">등록된 상품이 없습니다.</p>
-    {% else %}
-        {% for item in items %}
-        <div class="item-card">
-            {% if item.image_url %}
-            <img src="{{ item.image_url }}" alt="{{ item.name }}" class="item-img">
-            {% endif %}
+<div class="main-container">
+    <header style="text-align: center; margin-bottom: 40px;">
+        <h2>💐 BNT플라워 주문하기</h2>
+        <p style="color: #666; font-size: 14px;">오후 3시 이전 주문 시 당일 배송 가능합니다.</p>
+    </header>
 
-            <div class="item-info">
-                <h2>
-                    <a href="/market/{{ item.url_keyword }}">{{ item.name }}</a>
-                </h2>
-
-                <p>{{ item.content }}</p>
-
-                <p class="price">
-                    {% if item.price == 0 %}
-                        가격 협의 / 견적 문의
-                    {% else %}
-                        {{ item.price }}원
-                    {% endif %}
-                </p>
+    <div class="card-list">
+        <a href="/item?category=화환" class="product-card">
+            <div class="card-content">
+                <h3>축하/근조 화환</h3>
+                <p class="desc">결혼식, 장례식장 3단 화환</p>
+                <p class="price">100,000원 ~</p>
             </div>
-        </div>
-        {% endfor %}
-    {% endif %}
+        </a>
+        <a href="/item?category=난" class="product-card">
+            <div class="card-content">
+                <h3>동양란/서양란</h3>
+                <p class="desc">승진, 영전, 취임 축하 선물</p>
+                <p class="price">50,000원 ~</p>
+            </div>
+        </a>
+         <a href="/item?category=꽃다발" class="product-card">
+            <div class="card-content">
+                <h3>꽃다발/꽃바구니</h3>
+                <p class="desc">기념일, 생일, 프로포즈</p>
+                <p class="price">30,000원 ~</p>
+            </div>
+        </a>
+         <a href="/item?category=탁상용" class="product-card">
+            <div class="card-content">
+                <h3>탁상용 화분</h3>
+                <p class="desc">책상 위 공기정화, 인테리어</p>
+                <p class="price">50,000원 ~</p>
+            </div>
+        </a>
+         <a href="/item?category=사무실" class="product-card">
+            <div class="card-content">
+                <h3>사무실용 대형 화분</h3>
+                <p class="desc">개업식, 사무실 이전, 거실용</p>
+                <p class="price">100,000원 ~</p>
+            </div>
+        </a>
+    </div>
+</div>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "BNT플라워 인기 상품 목록",
+  "description": "BNT플라워에서 제공하는 화환, 난, 관엽식물 등 주요 상품 카테고리입니다.",
+  "url": "https://bntflower.co.kr",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "Product",
+        "name": "BNT 축하/근조 화환",
+        "description": "결혼식 및 장례식용 정품 3단 화환",
+        "url": "https://bntflower.co.kr/item?category=화환"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "Product",
+        "name": "BNT 승진 축하 동양란/서양란",
+        "url": "https://bntflower.co.kr/item?category=난"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "item": {
+        "@type": "Product",
+        "name": "BNT 꽃다발/꽃바구니",
+        "url": "https://bntflower.co.kr/item?category=꽃다발"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 4,
+      "item": {
+        "@type": "Product",
+        "name": "BNT 탁상용 공기정화 화분",
+        "url": "https://bntflower.co.kr/item?category=탁상용"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 5,
+      "item": {
+        "@type": "Product",
+        "name": "BNT 개업식 사무실 대형 화분",
+        "url": "https://bntflower.co.kr/item?category=사무실"
+      }
+    }
+  ]
+}
+</script>
+
 </body>
 </html>
