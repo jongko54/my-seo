@@ -2,21 +2,51 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>꽃배달 쇼핑몰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <style>
+        body { font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif; }
+    </style>
 </head>
-<body>
-    <h1>🌸 전국 꽃배달 상품 목록</h1>
-    <ul>
-        {% for item in items %}
-            <li>
-                <a href="/market/{{ item.url_keyword }}">
-                    <h3>{{ item.name }}</h3>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-pink-500">🌸 전국 꽃배달</h1>
+            <nav>
+                <a href="#" class="text-sm text-gray-500 hover:text-pink-500">로그인</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-10">
+        <h2 class="text-2xl font-bold mb-6">오늘의 추천 상품</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {% for item in items %}
+                <a href="/market/{{ item.url_keyword }}" class="group block bg-white rounded-xl shadow-sm hover:shadow-md transition duration-300 overflow-hidden border border-gray-100">
+                    <div class="aspect-w-1 aspect-h-1 w-full h-48 bg-gray-200 group-hover:opacity-90 transition">
+                         <div class="flex items-center justify-center h-full text-gray-400">이미지</div>
+                    </div>
+
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-pink-500 mb-1">{{ item.name }}</h3>
+                        <p class="text-pink-600 font-bold">{{ item.price }}원</p>
+                    </div>
                 </a>
-                <p>{{ item.price }}원</p>
-            </li>
-        {% else %}
-            <li>등록된 상품이 없습니다.</li>
-        {% endfor %}
-    </ul>
+            {% else %}
+                <div class="col-span-full text-center py-20 text-gray-500">
+                    <p>등록된 상품이 없습니다.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <footer class="bg-white border-t mt-12 py-8 text-center text-sm text-gray-400">
+        &copy; 2024 꽃배달 서비스 All rights reserved.
+    </footer>
+
 </body>
 </html>
